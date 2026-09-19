@@ -1,0 +1,32 @@
+{
+  "name": "supabase-edge-functions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Supabase Edge Functions with durable chat state and integration tests",
+  "scripts": {
+    "dev": "supabase functions serve --no-verify-jwt",
+    "dev:env": "supabase functions serve --no-verify-jwt --env-file ./supabase/.env.local",
+    "check": "deno check supabase/functions/userIncubatorId/index.ts supabase/functions/clients/index.ts supabase/functions/messages/index.ts tests/integration_test.ts",
+    "test": "deno test --allow-net --allow-env tests/integration_test.ts",
+    "test:bot": "deno run --allow-net --allow-env test_bot.ts",
+    "verify": "npm run check && npm run test",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:link": "supabase link --project-ref hdnildwzmoqldghjcscr",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push",
+    "deploy": "supabase functions deploy",
+    "deploy:userIncubatorId": "supabase functions deploy userIncubatorId --no-verify-jwt",
+    "deploy:clients": "supabase functions deploy clients --no-verify-jwt",
+    "deploy:messages": "supabase functions deploy messages --no-verify-jwt",
+    "deploy:all": "npm run deploy:userIncubatorId && npm run deploy:clients && npm run deploy:messages",
+    "webhook:setup": "deno run --allow-net --allow-env setup_webhook.ts",
+    "webhook:delete": "deno run --allow-net --allow-env setup_webhook.ts --delete",
+    "webhook:info": "deno run --allow-net --allow-env setup_webhook.ts --info",
+    "secret:token": "npx supabase secrets set TELEGRAM_BOT_TOKEN"
+  },
+  "devDependencies": {
+    "supabase": "^2.117.0"
+  }
+}
