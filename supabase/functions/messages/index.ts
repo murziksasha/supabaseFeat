@@ -14,11 +14,36 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const url = new URL(req.url);
+    const pathSegments = url.pathname.split("/").filter(Boolean);
+
+    // Find the segment following 'messages' (e.g. /functions/v1/messages/12345 or /messages/12345)
+    let externalUserId: string | null = null;
+    const messagesIndex = pathSegments.indexOf("messages");
+
+    if (messagesIndex !== -1 && pathSegments.length > messagesIndex + 1) {
+      externalUserId = decodeURIComponent(pathSegments[messagesIndex + 1]).trim();
+    }
+
+    // Also support query param fallback (?external_user_id=12345 or ?userId=12345)
+    if (!externalUserId) {
+      externalUserId =
+        url.searchParams.get("external_user_id")?.trim() ||
+        url.searchParams.get("userId")?.trim() ||
+        null;
+    }
+
     const supabase = getSupabaseClient();
-    const { data: messages, error } = await supabase
+    let query = supabase
       .from("messages")
       .select("*")
       .order("created_at", { ascending: false });
+
+    if (externalUserId) {
+      query = query.eq("external_user_id", externalUserId);
+    }
+
+    const { data: messages, error } = await query;
 
     if (error) {
       return errorResponse(error.message, 500);

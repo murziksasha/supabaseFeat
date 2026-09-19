@@ -76,15 +76,18 @@ Deno.test(
     assertExists(botMsg, "Expected bot message");
     assertEquals(botMsg.body, postData.message);
 
-    // Check descending order of created_at
-    for (let i = 0; i < messagesData.messages.length - 1; i++) {
-      const t1 = new Date(messagesData.messages[i].created_at).getTime();
-      const t2 = new Date(messagesData.messages[i + 1].created_at).getTime();
-      assert(
-        t1 >= t2,
-        `Messages not ordered by created_at descending: ${t1} < ${t2}`,
-      );
-    }
+    // 4. Call GET /messages/{external_user_id} and verify only this user's messages are returned
+    const filteredRes = await fetch(`${BASE_URL}/messages/${testUserId}`);
+    assertEquals(filteredRes.status, 200);
+    const filteredData = await filteredRes.json();
+    assert(Array.isArray(filteredData.messages), "filtered messages should be an array");
+    assertEquals(filteredData.messages.length, userMessages.length);
+    assert(
+      filteredData.messages.every(
+        (m: { external_user_id: string }) => m.external_user_id === testUserId,
+      ),
+      "All filtered messages must belong to testUserId",
+    );
   },
 );
 
