@@ -22,13 +22,13 @@ Deno.serve(async (req: Request) => {
     const messagesIndex = pathSegments.indexOf("messages");
 
     if (messagesIndex !== -1 && pathSegments.length > messagesIndex + 1) {
-      externalUserId = decodeURIComponent(pathSegments[messagesIndex + 1]).trim();
+      externalUserId = decodeURIComponent(pathSegments[messagesIndex + 1])
+        .trim();
     }
 
     // Also support query param fallback (?external_user_id=12345 or ?userId=12345)
     if (!externalUserId) {
-      externalUserId =
-        url.searchParams.get("external_user_id")?.trim() ||
+      externalUserId = url.searchParams.get("external_user_id")?.trim() ||
         url.searchParams.get("userId")?.trim() ||
         null;
     }
